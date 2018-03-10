@@ -1,5 +1,15 @@
+import math
+
 MOVE_FRAME = 40
-INITIAL_FRESHNESS = 5
+INITIAL_FRESHNESS = 10
+PERCEPTORS = 12
+ANGLE_STEP = 10
+PERCEPTORS_DISTANCE = 500
+STRAFING = False
+
+def distance(x1, y1, x2 ,y2):
+        dis = math.sqrt((x1-x2)  ** 2 + (y1-y2) ** 2)
+        return dis
 
 class Agent():
     def __init__(self, api, me):
@@ -10,7 +20,40 @@ class Agent():
     def updateMe(self, me):
         self.me = me
     
-    def goTo(self, x, y):
+
+
+    def findOffset(self):
+        #Negative offset = to the left, positive = to the right
+        #We start with the left ones (positive angles)
+        for i in range(1, PERCEPTORS):
+            print("Checking")
+            angle = i * ANGLE_STEP
+            x, y = self.me.findCoordinates(angle, PERCEPTORS_DISTANCE)
+            clear = self.api.moveTest(self.me.id, x , y)
+            if clear:
+                #front_x, front_y = self.me.findCoordinates(0, PERCEPTORS_DISTANCE)
+                #offset = distance(front_x, front_y, x, y)
+                print("Found an angle offset: " + str(angle))
+                return angle
+
+        #Right ones
+        for i in range(1, PERCEPTORS):
+            print("Checking")
+            angle = i * ANGLE_STEP
+            x, y = self.me.findCoordinates(360 - angle, PERCEPTORS_DISTANCE)
+            clear = self.api.moveTest(self.me.id, x , y)
+            if clear:
+                #front_x, front_y = self.me.findCoordinates(0, PERCEPTORS_DISTANCE)
+                #offset = distance(front_x, front_y, x, y)
+                print("Found an offset: " + str(-angle))
+                return -angle
+        
+        print("No solutions found")
+        return 0
+
+
+
+    def goTo(self, x, y, noSlowDown = False):
         clear = self.goToCleared
         distance = self.me.distanceToPos(x, y)
         print(distance)
@@ -41,12 +84,13 @@ class Agent():
             computedAngle = self.me.angleToPos(x, y)
             delta = self.me.angle - computedAngle
             #Slower approach when we get close
-            if distance < 1000:
-                    speed = speed / 2
+            if not noSlowDown:
+                if distance < 1000:
+                        speed = speed / 2
 
-            if distance < 500:
-                    speed = speed / 4
-            
+                if distance < 500:
+                        speed = speed / 4
+
             if abs(delta) < 5:
                 self.api.sendAction("forward", speed)
                 return False
@@ -56,6 +100,13 @@ class Agent():
                 return False
         else:
             print("Obstructed")
+            angle = self.findOffset()
+            if STRAFING:
+                #Left to implement
+                return False
+            else:
+                self.api.turn(angle + self.me.angle)
+                self.api.sendAction("forward", speed)
             return False
     
     def print(self):

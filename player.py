@@ -45,3 +45,10 @@ class Player():
     def distanceToPos(self, x ,y):
         dis = math.sqrt((x-self.x) ** 2 + (y-self.y) ** 2)
         return dis
+    
+    def findCoordinates(self, angle, distance):
+        alpha = (math.pi/180) * (self.angle + angle)
+        x = self.x + distance * math.cos(alpha)
+        y = self.y + distance * math.sin(alpha)
+        
+        return int(round(x)), int(round(y))

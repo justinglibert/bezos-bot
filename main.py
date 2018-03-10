@@ -63,10 +63,10 @@ def main():
         print(stylize("BEZOS BOT", colored.fg("green")))
         agent.print()
         if not reached:
-            reached = agent.goTo(520, -495)
+            reached = agent.goTo(520, -495, True)
         #clearscreen()
         #world.printObjects()
-        time.sleep( 1 / 60 / 4)
+        time.sleep( 1 / 60 * 5)
 
         
 
