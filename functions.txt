@@ -1,0 +1,55 @@
+In the world:
+-	Other players
+-	Me
+-	Guns
+-	Medi-packs
+-	Ammos
+
+Strategy:
+	- move to closest mediPack asap
+	- loop shoot lowest health 
+	- if getDoWeNeedMediPack returns true: we use mediPack
+	- run to next mediPack, loop
+
+	
+
+Variables:
+	damageOfGun1
+	damageOfGun2
+	mediPackHealAmount
+	
+	
+
+Functions:
+
+-	getAngle()
+		x_off = self.x - x;
+		y_off = self.y - y;
+		z_off = self.z - z;
+		direction = tan(y/x);
+		offset = orientation + direction;
+		
+		return offset;
+
+-	getClosestGuns():
+		return { gunLocation, Gun} ;
+
+-	getBoolClosestToGun( Location ):
+		return true/false;
+
+-	getDoWeNeedMediPack():
+		return true/false;
+
+-	getDoWeNeedAmmos(): 
+		
+		return true/false;
+
+-	getPlayerWithLowestHealth():
+
+		return player.id;
+
+- 	getPlayerWithSmallestAngle():
+
+		for (player : players):
+			getAngle
+		
