@@ -1,6 +1,6 @@
 import colored
 from colored import stylize
-
+import math
 def greenText(text):
     return stylize(text, colored.fg("green"))
 
@@ -28,3 +28,20 @@ class Player():
         health: {4}
         angle: {5}
         '''.format(self.x, self.y, self.z, self.height, self.health, self.angle))
+    
+    def angleToPos(self, x, y):
+        dis = math.sqrt((x-self.x) ** 2 + (y-self.y) ** 2)
+        x_off = x - self.x
+
+        y_off = y - self.y
+
+        alpha = (math.acos(x_off / dis) * 180 / math.pi) 
+
+        if (y_off > 0):
+            return (alpha)
+        else:
+            return (360 - alpha) % 360
+    
+    def distanceToPos(self, x ,y):
+        dis = math.sqrt((x-self.x) ** 2 + (y-self.y) ** 2)
+        return dis

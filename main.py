@@ -8,7 +8,9 @@ from agent import Agent
 import time
 import os
 from timer import RepeatedTimer
-API_ENDPOINT = "http://192.168.43.222:6001/api"
+#API_ENDPOINT = "http://192.168.43.222:6001/api"
+API_ENDPOINT = "http://localhost:6001/api"
+
 api = Api(API_ENDPOINT)
 #Hyperparameters
 QUERY_OBJECT_FREQUENCY = 2
@@ -56,13 +58,15 @@ def main():
     world, agent = init()
     queryObjectsTimer = RepeatedTimer(QUERY_OBJECT_FREQUENCY, queryObjects, world)
     queryPlayersTimer = RepeatedTimer(QUERY_PLAYER_FREQUENCY, queryPlayers, world, agent)
-
+    reached = False
     while True:
         print(stylize("BEZOS BOT", colored.fg("green")))
         agent.print()
+        if not reached:
+            reached = agent.goTo(520, -495)
         #clearscreen()
         #world.printObjects()
-        time.sleep( 1 / 60 * 3)
+        time.sleep( 1 / 60 / 4)
 
         
 
