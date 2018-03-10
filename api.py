@@ -27,4 +27,8 @@ class Api():
         payload = {'target_angle': angle}
         r = requests.post(self.endpoint + '/player/turn', data=json.dumps(payload))
         return r.text
+    def moveTest(self, id, x , y):
+        payload = {'id': id, 'x': x, 'y': y}
+        r = requests.get( self.endpoint + '/world/movetest', params=payload)
+        return r.json()['result']
     
