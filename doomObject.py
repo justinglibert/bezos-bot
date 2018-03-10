@@ -1,4 +1,5 @@
 import colored
+import math
 from colored import stylize
 
 def greenText(text):
@@ -31,15 +32,15 @@ class DoomObject():
     def angleToPos(self, x, y):
         dis = math.sqrt((x-self.x) ** 2 + (y-self.y) ** 2)
         x_off = x - self.x
-        print ("x_off: " + str(x_off))
-
         y_off = y - self.y
-        print ("y_off: " + str(y_off))
 
-        alpha = (math.acos(x_off / dis) * 180 / math.pi) 
-        print ("a: " + str(alpha))
+        if (dis > 0 or dis < 0):
+            alpha = (math.acos(x_off / dis) * 180 / math.pi)
+        elif (dis == 0):
+            return 0
 
         if (y_off > 0):
             return (alpha)
         else:
             return (360 - alpha) % 360
+
