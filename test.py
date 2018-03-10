@@ -5,12 +5,12 @@ import math
 testObj = DoomObject ({
     "id": 1,
     'position': {
-        "x": 100,
-        "y": 100,
+        "x": 0,
+        "y": 0,
         "z": 0
     },
     "height": 1,
-    "angle": 0,
+    "angle": 180,
     "health": 100,
     "type": 1,
     "distance": 200
@@ -35,9 +35,12 @@ def angleToPos(obj, x, y):
 
 
 def findCoordinates(obj, angle, distance):
-    alpha = math.radians(self.angle + angle)
-    x = self.x + distance * math.cos(alpha)
-    y = self.y + distance * math.sin(alpha)
-    return x, y
+    alpha = (math.pi/180) * (obj.angle + angle)
 
+    x = obj.x + distance * math.cos(alpha)
 
+    y = obj.y + distance * math.sin(alpha)
+    
+    return int(round(x)), int(round(y))
+
+print(findCoordinates(testObj, -90, 90 ))

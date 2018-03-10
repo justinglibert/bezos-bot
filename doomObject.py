@@ -44,3 +44,11 @@ class DoomObject():
         else:
             return (360 - alpha) % 360
 
+    def findCoordinates(self, angle, distance):
+        alpha = (math.pi/180) * (self.angle + angle)
+        x = self.x + distance * math.cos(alpha)
+        y = self.y + distance * math.sin(alpha)
+        
+        return int(round(x)), int(round(y))
+    
+
