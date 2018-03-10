@@ -10,30 +10,32 @@ testObj = DoomObject ({
         "z": 0
     },
     "height": 1,
-    "angle": -90,
+    "angle": 180,
     "health": 100,
     "type": 1,
     "distance": 200
 })
 
-def angleToPos(obj, x, y):
-    dis = math.sqrt((x-obj.x) ** 2 + (y-obj.y) ** 2)
-    x_off = x - obj.x
-    y_off = y - obj.y
+def angleToPos(self, x, y):
+    dis = math.sqrt((x-self.x) ** 2 + (y-self.y) ** 2)
+    x_off = x - self.x
+    y_off = y - self.y
 
     if (dis > 0 or dis < 0):
         if(y_off > 0):
             alpha = (math.acos(x_off / dis) * 180 / math.pi)
         else:
             alpha = -(math.acos(x_off / dis) * 180 / math.pi)
-        print("alpha " + str(alpha))
     elif (dis == 0):
         return 0
 
-    t = alpha - obj.angle
-
-    
-    return t
+    t = alpha - self.angle
+    if (t < -180):
+        return round(360 + t) % 360
+    elif( t > 180):
+        return round(-360 + t) % 360
+    else:
+        return round(t)
 
 
 def findCoordinates(obj, angle, distance):
@@ -45,4 +47,4 @@ def findCoordinates(obj, angle, distance):
     
     return int(round(x)), int(round(y))
 
-print(angleToPos(testObj, -10, -10 ))
+print(angleToPos(testObj, 10, -10))
