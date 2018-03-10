@@ -27,3 +27,14 @@ class DoomObject():
         angle: {5}
         type: {6}
         '''.format(self.x, self.y, self.z, self.height, self.health, self.angle, self.type))
+
+    def angleToPos(self, x, y):
+        dis = math.sqrt((x-self.x) ** 2 + (y-self.y) ** 2)
+        x_off = x - self.x
+        y_off = y - self.y
+        alpha = (math.acos(x_off / dis) * 180 / math.pi) 
+
+        if (y_off > 0):
+            return (180-alpha) % 360
+        else:
+            return (180+alpha) % 360
