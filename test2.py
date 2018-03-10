@@ -20,6 +20,8 @@ def angleToPos(obj, x, y):
     dx = x - obj.x
     dy = y - obj.y
     dis = math.sqrt(dx*dx + dy*dy)
+    if (dis == 0):
+        return 0
     # 180 < alpha < 0 -> angle between x=0 and position (x,y)
     if (dy > 0):
         alpha = math.acos(dx / dis) * 180 / math.pi
@@ -37,7 +39,6 @@ def angleToPos(obj, x, y):
     else:
         result = angleToTurn
 
-    print("Result: " + str(result))
     return result
 
 
