@@ -43,7 +43,12 @@ class Player():
             return 0
 
         t = alpha - self.angle
-        return t
+        if (t < -180):
+            return round(360 + t) % 360
+        elif( t > 180):
+            return round(-360 + t) % 360
+        else:
+            return round(t)
     
     def distanceToPos(self, x ,y):
         dis = math.sqrt((x-self.x) ** 2 + (y-self.y) ** 2)
