@@ -4,7 +4,9 @@ MOVE_FRAME = 40
 INITIAL_FRESHNESS = 10
 PERCEPTORS = 12
 ANGLE_STEP = 10
-PERCEPTORS_DISTANCE = 500
+PERCEPTORS_DISTANCE = 300
+MULTIPLIER_TURN = 0.28
+MULTIPLIER_CONSTANT = 5
 STRAFING = False
 
 def distance(x1, y1, x2 ,y2):
@@ -29,6 +31,7 @@ class Agent():
             print("Checking")
             angle = i * ANGLE_STEP
             x, y = self.me.findCoordinates(angle, PERCEPTORS_DISTANCE)
+            print("My Id according to agent" + str(self.me.id))
             clear = self.api.moveTest(self.me.id, x , y)
             if clear:
                 #front_x, front_y = self.me.findCoordinates(0, PERCEPTORS_DISTANCE)
@@ -56,7 +59,7 @@ class Agent():
     def goTo(self, x, y, noSlowDown = False):
         clear = self.goToCleared
         distance = self.me.distanceToPos(x, y)
-        print(distance)
+        print("Distance to objective:" + str(distance))
         speed = MOVE_FRAME
         if distance < 50:
             print("Done")
@@ -73,7 +76,7 @@ class Agent():
             clear = self.api.moveTest(self.me.id, x, y)
             self.goToCleared = clear
             self.freshness = INITIAL_FRESHNESS
-        #Otherwise we decrease the freshness
+        #Otherwise  we decrease the freshness
         else:
             self.freshness = self.freshness - 1
 
@@ -90,12 +93,18 @@ class Agent():
 
                 if distance < 500:
                         speed = speed / 4
-
+            print("Delta: " + str(delta))
+            print("ComputedAngle: " + str(computedAngle)) 
             if abs(delta) < 5:
                 self.api.sendAction("forward", speed)
                 return False
             else:
-                self.api.turn(computedAngle)
+                turn_type = None
+                if computedAngle > self.me.angle:
+                    turn_type = "turn-left"
+                else:
+                    turn_type = "turn-right"
+                self.api.sendAction(turn_type, abs(computedAngle  - self.me.angle) * MULTIPLIER_TURN + MULTIPLIER_CONSTANT)
                 self.api.sendAction("forward", speed)
                 return False
         else:
@@ -105,7 +114,12 @@ class Agent():
                 #Left to implement
                 return False
             else:
-                self.api.turn(angle + self.me.angle)
+                turn_type = None
+                if angle > 0:
+                    turn_type = "turn-left"
+                else:
+                    turn_type = "turn-right"
+                self.api.sendAction(turn_type, abs(angle) * MULTIPLIER_TURN + MULTIPLIER_CONSTANT)
                 self.api.sendAction("forward", speed)
             return False
     

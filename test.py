@@ -1,4 +1,4 @@
-from object import DoomObject
+from doomObject import DoomObject
 import unittest
 import math
 
@@ -10,7 +10,7 @@ testObj = DoomObject ({
         "z": 0
     },
     "height": 1,
-    "angle": 180,
+    "angle": -90,
     "health": 100,
     "type": 1,
     "distance": 200
@@ -22,16 +22,18 @@ def angleToPos(obj, x, y):
     y_off = y - obj.y
 
     if (dis > 0 or dis < 0):
-        alpha = (math.acos(x_off / dis) * 180 / math.pi)
+        if(y_off > 0):
+            alpha = (math.acos(x_off / dis) * 180 / math.pi)
+        else:
+            alpha = -(math.acos(x_off / dis) * 180 / math.pi)
+        print("alpha " + str(alpha))
     elif (dis == 0):
         return 0
 
-    if (y_off > 0):
-        return (alpha)
-    elif (y_off < 0):
-        return (360 - alpha) % 360
-    else:
-        return 0
+    t = alpha - obj.angle
+
+    
+    return t
 
 
 def findCoordinates(obj, angle, distance):
@@ -43,4 +45,4 @@ def findCoordinates(obj, angle, distance):
     
     return int(round(x)), int(round(y))
 
-print(findCoordinates(testObj, -90, 90 ))
+print(angleToPos(testObj, -10, -10 ))

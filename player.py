@@ -32,15 +32,18 @@ class Player():
     def angleToPos(self, x, y):
         dis = math.sqrt((x-self.x) ** 2 + (y-self.y) ** 2)
         x_off = x - self.x
-
         y_off = y - self.y
 
-        alpha = (math.acos(x_off / dis) * 180 / math.pi) 
+        if (dis > 0 or dis < 0):
+            if(y_off > 0):
+                alpha = (math.acos(x_off / dis) * 180 / math.pi)
+            else:
+                alpha = -(math.acos(x_off / dis) * 180 / math.pi)
+        elif (dis == 0):
+            return 0
 
-        if (y_off > 0):
-            return (alpha)
-        else:
-            return (360 - alpha) % 360
+        t = alpha - self.angle
+        return t
     
     def distanceToPos(self, x ,y):
         dis = math.sqrt((x-self.x) ** 2 + (y-self.y) ** 2)

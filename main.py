@@ -66,7 +66,11 @@ def main():
             reached = agent.goTo(520, -495, True)
         #clearscreen()
         #world.printObjects()
-        time.sleep( 1 / 60 * 5)
+        time.sleep( 1 / 2)
+        world.printPlayers()
+        if agent.me.health <= 0:
+            agent.api.sendAction("shoot")
+            world, agent = init()
 
         
 
