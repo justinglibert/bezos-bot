@@ -1,5 +1,5 @@
 import requests
-
+import json
 class Api():
     def __init__(self, endpoint):
         self.endpoint = endpoint
@@ -21,10 +21,10 @@ class Api():
         return r.json()
     def sendAction(self, action_type, amount = 10):
         payload = {'type': action_type, 'amount': amount}
-        r = requests.post(self.endpoint + '/player/actions', data=payload)
-        return r.json()
+        r = requests.post(self.endpoint + '/player/actions', data=json.dumps(payload))
+        return r.text
     def turn(self, angle):
         payload = {'target_angle': angle}
-        r = requests.post(self.endpoint + '/player/turn', data=payload)
-        return r.json()
+        r = requests.post(self.endpoint + '/player/turn', data=json.dumps(payload))
+        return r.text
     
