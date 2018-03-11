@@ -1,5 +1,6 @@
 import math
-
+import colored
+from colored import stylize
 MOVE_FRAME = 50
 INITIAL_FRESHNESS = 5
 PERCEPTORS = 12
@@ -8,6 +9,10 @@ PERCEPTORS_DISTANCE = 500
 MULTIPLIER_TURN = 0.28
 MULTIPLIER_CONSTANT = 5
 STRAFING = False
+
+
+def greenText(text):
+    return stylize(text, colored.fg("green"))
 
 def getDistance(x1, y1, x2 ,y2):
         dis = math.sqrt((x1-x2)  ** 2 + (y1-y2) ** 2)
@@ -75,7 +80,11 @@ class Agent():
             self.api.sendAction(turn_type, abs(computedAngle) * MULTIPLIER_TURN + MULTIPLIER_CONSTANT)
             return False
     def goTo(self, x, y, noSlowDown = False):
-
+        freshness = self.freshness
+        print("RECTANGLE: " + str(greenText(self.me.isInRectangle())))
+        if(not self.me.isInRectangle()):
+            print("Not in rectangle")
+            freshness = 0
         clear = self.goToCleared
         distance = self.me.distanceToPos(x, y)
         print("Going to: " + str(x) + " " + str(y))
@@ -99,7 +108,7 @@ class Agent():
             self.freshness = INITIAL_FRESHNESS
         #If it's not fresh or if it's false we query again
        
-        elif self.freshness <= 0 or clear == False:
+        elif freshness <= 0 or clear == False:
             print("RECHECKING THE CLARITY")
             if(self.me.distanceToPos(x ,y) < PERCEPTORS_DISTANCE):
                 clear = self.api.moveTest(self.me.id, x, y)
