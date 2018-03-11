@@ -67,6 +67,9 @@ def init():
 
 def findIdOfMostUsefulPolicies(world, policies, api):
     pol = sorted(policies, key=(lambda pol: pol.test(world, api)), reverse=True)
+    #for p in pol:
+    #    print(p.getName())
+    #    print(p.test(world, api))
     return pol[0]
 
 

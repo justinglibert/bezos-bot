@@ -2,8 +2,8 @@ import math
 import time
 from time import sleep
 from policy import Policy
-
-
+import copy
+import random
 
 
 
@@ -42,12 +42,21 @@ WEAPONS = {
     }
 }
 
+WEAPONS_FORK = copy.deepcopy(WEAPONS)
+WEAPONS_FORK['Rocket Launcher']['strength'] = 0
+
 
 def rankWeaponsBasedOnAvailabityAndAmmo(me):
     weapons = [v for (k,v) in WEAPONS.items() if me.weapons[k] == True and me.ammo[v['ammo']] > 0 ]
+    
+    if getDistance(me.x, me.y, -1325, -541) > 2600:
+        print("Distance from the center " + str(getDistance(me.x, me.y, -1325, -541)))
+        print("FAR FROM THE CENTER")
+        weapons = [v for (k,v) in WEAPONS_FORK.items() if me.weapons[k] == True and me.ammo[v['ammo']] > 0 ]
+
     #print(weapons)
     weapons = sorted(weapons, key = lambda w: w['strength'], reverse=True)
-    #print("My weapons: " + str(weapons))
+    print("My weapons: " + str(weapons))
     return weapons
 
 
@@ -217,6 +226,28 @@ def polBulletsExecute(world, agent):
 polBullets= Policy(polBulletsUtility, polBulletsExecute, "Grabing bullets")
 
 
+
+
+def polRocketUtility(world):
+    if world.findClosestObjectByType('Box of Rockets') is not None and world.getMe().weapons['Rocket Launcher'] == True and world.getMe().ammo['Rockets'] <= 1:
+        ammo = world.findClosestObjectByType('Box of Rockets')
+        me = world.getMe()
+        distance = getDistance(ammo.x, ammo.y, me.x, me.y)
+        if distance < 3000:
+            return 200
+        elif world.getMe().ammo['Rockets'] <= 0:
+            return 250
+    else:
+        return 0
+
+
+def polRocketExecute(world, agent):
+    closestShells = world.findClosestObjectByType('Box of Rockets')
+    agent.goTo(closestShells.x, closestShells.y)
+
+polRockets= Policy(polRocketUtility, polRocketExecute, "Grabing rockets")
+
+
 #Shooting
 def polShootPlayerInRectangleUtility(world):
     closePlayers = world.rankPlayersByDistance()
@@ -232,6 +263,9 @@ def polShootPlayerInRectangleUtility(world):
 
     me = world.getMe()
     return (getDistance(closest.x, closest.y, me.x, me.y) < 10000) * 300 + (getDistance(closest.x, closest.y, me.x, me.y) < 2000) * 700
+
+def shootSafe(agent):
+    agent.api.sendAction('shoot')
 
 def polShootPlayerInRectangleExecute(world, agent):
     closePlayers = world.rankPlayersByDistance()
@@ -251,7 +285,7 @@ def polShootPlayerInRectangleExecute(world, agent):
         agent.goToBackward(safe_x, safe_y, p.x, p.y)
 
     if distance < 800:
-        agent.api.sendAction('shoot')
+        shootSafe(agent)
 
 
 polShootPlayerInRectangle = Policy(polShootPlayerInRectangleUtility, polShootPlayerInRectangleExecute, "Killing players in the rectangle")
@@ -278,7 +312,7 @@ def polShootPlayerExecute(world, agent):
         agent.goToBackward(safe_x, safe_y, p.x, p.y)
 
     if distance < 800:
-        agent.api.sendAction('shoot')
+        shootSafe(agent)
     
 polShootPlayer = Policy(polShootPlayerUtility, polShootPlayerExecute, "Killing players")
 
@@ -366,4 +400,4 @@ polStrafe= Policy(polTestStrafeUtility, polTestStrafeExecute, "testing strafe")
 #Green armor 100%
 
 #polChooseWeapon polStrafe
-Policies = [polNothing, polDead, polShotGun, polChainsaw, polBFG, polShootPlayer, polShootPlayerLowLife, polShootPlayerInRectangle, polChooseWeapon, polShotgunShells, polBullets, polArmor, polLife, polRL]
+Policies = [polNothing, polDead, polShotGun, polChainsaw, polBFG, polShootPlayer, polShootPlayerLowLife, polShootPlayerInRectangle, polChooseWeapon, polShotgunShells, polBullets, polArmor, polLife, polRL, polRockets ]

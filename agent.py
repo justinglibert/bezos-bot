@@ -175,7 +175,7 @@ class Agent():
     
     
     def goToBackward(self, x, y, x_facing, y_facing):
-        freshness = self.freshness
+        ''' freshness = self.freshness
         clear = self.goToCleared
 
         if freshness <= 0 or clear == False:
@@ -209,7 +209,7 @@ class Agent():
             else:
                 turn_type = "turn-right"
             self.api.sendAction(turn_type, abs(computedAngle) * MULTIPLIER_TURN + MULTIPLIER_CONSTANT)
-            self.api.sendAction("forward", speed + 40)
+            self.api.sendAction("forward", speed + 40) '''
 
 
         computedAngle = self.me.angleToPos(x_facing, y_facing)
