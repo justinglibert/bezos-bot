@@ -355,9 +355,9 @@ def polLifeUtility(world):
         me = world.getMe()
         distance = getDistance(ammo.x, ammo.y, me.x, me.y)
         if distance < 1000:
-            return 1000
-        else:
             return 200
+        else:
+            return 100
     else:
         return 0
 
