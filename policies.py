@@ -102,7 +102,7 @@ def polRLUtility(world):
         print("RL available: " + str(rl is not None))
         distance = rl.distanceFromPlayer
         print("Distance from RL " + str(distance))
-        return 1000 *int(world.getMe().weapons['Rocket Launcher'] == False) * int(distance < 1500)
+        return 1000 *int(world.getMe().weapons['Rocket Launcher'] == False) * (int(distance < 1500) + 0.2)
     else:
         rl = world.findClosestObjectByType('Rocket launcher')
         print("RL available: " + str(rl is not None))
@@ -136,7 +136,7 @@ polShotGun = Policy(polShotgunUtility, polShotgunExecute, "Grabing a Shotgun")
 
 def polChainsawUtility(world):
     if world.findClosestObjectByType('Chainsaw') is not None:
-        return 200 *int(world.getMe().weapons['Chainsaw'] == False)
+        return 100 *int(world.getMe().weapons['Chainsaw'] == False)
     else:
         return 0
 
@@ -240,18 +240,18 @@ def polShootPlayerInRectangleExecute(world, agent):
     if(len(closePlayers)== 0):
         return 0
     closest = closePlayers[0]
-    distance = getDistance(closest.x, closest.y, me.x, me.y)
-    if distance > 150:
-        agent.goTo(closest.x, closest.y)
+    p = closest
+    angleBetweenUs = agent.me.angleToPos(p.x , p.y)
+    distance = getDistance(agent.me.x, agent.me.y, p.x, p.y)
+    safe_x , safe_y = agent.me.findCoordinates(angleBetweenUs, distance - 250)
+
+    if(distance > 310):
+        agent.goTo(safe_x, safe_y)
     else:
-        print("Too Close!!")
-        agent.face(closest.x, closest.y)
-    print(str(agent.goToCleared))
-    if (distance < 1000 and agent.goToCleared) or distance < 200:
-        print("Angle of shooting: " + str(abs(agent.me.angleToPos(closest.x, closest.y))))
-        if abs(agent.me.angleToPos(closest.x, closest.y)) < 30:
-            if(agent.api.moveTest(agent.me.id, closest.x , closest.y)):
-                agent.api.sendAction("shoot")
+        agent.goToBackward(safe_x, safe_y, p.x, p.y)
+
+    if distance < 800:
+        agent.api.sendAction('shoot')
 
 
 polShootPlayerInRectangle = Policy(polShootPlayerInRectangleUtility, polShootPlayerInRectangleExecute, "Killing players in the rectangle")
@@ -265,21 +265,20 @@ def polShootPlayerUtility(world):
     return (getDistance(closest.x, closest.y, me.x, me.y) < 10000) * 200 + (getDistance(closest.x, closest.y, me.x, me.y) < 2000) * 400
 
 def polShootPlayerExecute(world, agent):
-    closePlayers = world.rankPlayersByDistance()
-    me = world.getMe()
-    closest = closePlayers[0]
-    distance = getDistance(closest.x, closest.y, me.x, me.y)
-    if distance > 150:
-        agent.goTo(closest.x, closest.y)
+    players = world.rankPlayersByDistance()
+    p = players[0]
+    angleBetweenUs = agent.me.angleToPos(p.x , p.y)
+    distance = getDistance(agent.me.x, agent.me.y, p.x, p.y)
+
+    safe_x , safe_y = agent.me.findCoordinates(angleBetweenUs, distance - 250)
+
+    if(distance > 310):
+        agent.goTo(safe_x, safe_y)
     else:
-        print("Too Close!!")
-        agent.face(closest.x, closest.y)
-    print(str(agent.goToCleared))
-    if (distance < 1000 and agent.goToCleared) or distance < 200:
-        print("Angle of shooting: " + str(abs(agent.me.angleToPos(closest.x, closest.y))))
-        if abs(agent.me.angleToPos(closest.x, closest.y)) < 30:
-            if(agent.api.moveTest(agent.me.id, closest.x , closest.y)):
-                agent.api.sendAction("shoot")
+        agent.goToBackward(safe_x, safe_y, p.x, p.y)
+
+    if distance < 800:
+        agent.api.sendAction('shoot')
     
 polShootPlayer = Policy(polShootPlayerUtility, polShootPlayerExecute, "Killing players")
 
@@ -367,4 +366,4 @@ polStrafe= Policy(polTestStrafeUtility, polTestStrafeExecute, "testing strafe")
 #Green armor 100%
 
 #polChooseWeapon polStrafe
-Policies = [polNothing, polDead, polShotGun, polChainsaw, polBFG, polShootPlayer, polShootPlayerLowLife, polShootPlayerInRectangle, polChooseWeapon, polShotgunShells, polBullets, polArmor, polLife, polRL, polStrafe]
+Policies = [polNothing, polDead, polShotGun, polChainsaw, polBFG, polShootPlayer, polShootPlayerLowLife, polShootPlayerInRectangle, polChooseWeapon, polShotgunShells, polBullets, polArmor, polLife, polRL]

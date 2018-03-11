@@ -131,10 +131,10 @@ class Agent():
             #Slower approach when we get close
             if not noSlowDown:
                 if distance < 1000:
-                        speed = speed / 2
+                        speed = speed / 1.5
 
                 if distance < 500:
-                        speed = speed / 2
+                        speed = speed / 1.5
             print("ComputedAngle: " + str(computedAngle)) 
 
             if abs(computedAngle) < 5:
