@@ -11,6 +11,7 @@ class Player():
         self.x = json['position']['x']
         self.y = json['position']['y']
         self.z = json['position']['z']
+        self.weapons = json['weapons']
         self.height = json['height']
         self.angle = json['angle']
         self.health = json['health']

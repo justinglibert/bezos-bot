@@ -1,9 +1,9 @@
 import math
 
-MOVE_FRAME = 40
+MOVE_FRAME = 50
 INITIAL_FRESHNESS = 10
 PERCEPTORS = 12
-ANGLE_STEP = 10
+ANGLE_STEP = 15
 PERCEPTORS_DISTANCE = 300
 MULTIPLIER_TURN = 0.28
 MULTIPLIER_CONSTANT = 5
@@ -57,8 +57,10 @@ class Agent():
 
 
     def goTo(self, x, y, noSlowDown = False):
+
         clear = self.goToCleared
         distance = self.me.distanceToPos(x, y)
+        print("Going to: " + str(x) + " " + str(y))
         print("Distance to objective:" + str(distance))
         speed = MOVE_FRAME
         if distance < 50:
@@ -85,41 +87,48 @@ class Agent():
         if clear:
             print("Clear")
             computedAngle = self.me.angleToPos(x, y)
-            delta = self.me.angle - computedAngle
             #Slower approach when we get close
             if not noSlowDown:
                 if distance < 1000:
                         speed = speed / 2
 
                 if distance < 500:
-                        speed = speed / 4
-            print("Delta: " + str(delta))
+                        speed = speed / 2
             print("ComputedAngle: " + str(computedAngle)) 
-            if abs(delta) < 5:
+
+            if abs(computedAngle) < 5:
                 self.api.sendAction("forward", speed)
                 return False
             else:
                 turn_type = None
-                if computedAngle > self.me.angle:
+                if computedAngle > 180:
+                    computedAngle = computedAngle - 360
+                if computedAngle < -180:
+                    computedAngle = 360 + computedAngle
+                if computedAngle > 0:
                     turn_type = "turn-left"
                 else:
                     turn_type = "turn-right"
-                self.api.sendAction(turn_type, abs(computedAngle  - self.me.angle) * MULTIPLIER_TURN + MULTIPLIER_CONSTANT)
+                self.api.sendAction(turn_type, abs(computedAngle) * MULTIPLIER_TURN + MULTIPLIER_CONSTANT)
                 self.api.sendAction("forward", speed)
                 return False
         else:
             print("Obstructed")
-            angle = self.findOffset()
+            computedAngle = self.findOffset()
             if STRAFING:
                 #Left to implement
                 return False
             else:
                 turn_type = None
-                if angle > 0:
+                if computedAngle > 180:
+                    computedAngle = 360 - computedAngle
+                if computedAngle < -180:
+                    computedAngle = 360 + computedAngle
+                if computedAngle > 0:
                     turn_type = "turn-left"
                 else:
                     turn_type = "turn-right"
-                self.api.sendAction(turn_type, abs(angle) * MULTIPLIER_TURN + MULTIPLIER_CONSTANT)
+                self.api.sendAction(turn_type, abs(computedAngle) * MULTIPLIER_TURN + MULTIPLIER_CONSTANT)
                 self.api.sendAction("forward", speed)
             return False
     

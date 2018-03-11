@@ -4,18 +4,61 @@ from colored import stylize
 from doomObject import DoomObject
 from player import Player
 from world import World
+from policy import Policy
 from agent import Agent
 import time
 import os
+import math
 from timer import RepeatedTimer
 #API_ENDPOINT = "http://192.168.43.222:6001/api"
 API_ENDPOINT = "http://localhost:6001/api"
 
 api = Api(API_ENDPOINT)
 #Hyperparameters
-QUERY_OBJECT_FREQUENCY = 2
-QUERY_PLAYER_FREQUENCY = 0.5
-DISTANCE = 1000
+QUERY_OBJECT_FREQUENCY = 2 
+QUERY_PLAYER_FREQUENCY = 0.5 
+DISTANCE = 100000
+
+def getDistance(x1, y1, x2 ,y2):
+        dis = math.sqrt((x1-x2)  ** 2 + (y1-y2) ** 2)
+        return dis
+
+
+
+
+
+polShotGun = Policy(lambda world: 100 *int(world.getMe().weapons['Shotgun'] == False), lambda world, agent: agent.goTo(520, -495, False))
+
+
+
+def polChainsawExecute(world, agent):
+    closestChainsaw = world.findClosestObjectByType('Chainsaw')
+    agent.goTo(closestChainsaw.x, closestChainsaw.y)
+
+polChainsaw= Policy(lambda world: 200 *int(world.getMe().weapons['Chainsaw'] == False), polChainsawExecute)
+
+
+polNothing = Policy(lambda world: 1, lambda world, agent: print("Nothing to do"))
+
+
+
+def polShootPlayerUtility(world):
+    closePlayers = world.rankPlayersByDistance()
+    closest = closePlayers[0]
+    me = world.getMe()
+    return (getDistance(closest.x, closest.y, me.x, me.y) < 10000) * 10**5
+
+def polShootPlayerExecute(world, agent):
+    closePlayers = world.rankPlayersByDistance()
+    closest = closePlayers[0]
+    agent.goTo(closest.x, closest.y)
+    agent.api.sendAction("shoot")
+    
+
+polShootPlayer = Policy(polShootPlayerUtility, polShootPlayerExecute)
+
+
+policies = [polShotGun, polNothing, polChainsaw, polShootPlayer]
 
 def clearscreen(numlines=100):
   """Clear the console.
@@ -50,8 +93,15 @@ def init():
     objects = api.getObjects(DISTANCE)
     world = World(me, objects, players)
     world.getMe().print()
+    world.print()
     agent = Agent(api, world.getMe())
     return world, agent
+
+
+def findIdOfMostUsefulPolicies(world, policies, api):
+    pol = sorted(policies, key=(lambda pol: pol.test(world, api)), reverse=True)
+    return pol[0]
+
 
 def main():
     #First init
@@ -62,8 +112,8 @@ def main():
     while True:
         print(stylize("BEZOS BOT", colored.fg("green")))
         agent.print()
-        if not reached:
-            reached = agent.goTo(520, -495, True)
+        best_pol = findIdOfMostUsefulPolicies(world, policies, api)
+        best_pol.execute(world, agent)
         #clearscreen()
         #world.printObjects()
         time.sleep( 1 / 2)
