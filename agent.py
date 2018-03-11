@@ -1,7 +1,7 @@
 import math
 
 MOVE_FRAME = 50
-INITIAL_FRESHNESS = 10
+INITIAL_FRESHNESS = 5
 PERCEPTORS = 12
 ANGLE_STEP = 15
 PERCEPTORS_DISTANCE = 300
@@ -9,7 +9,7 @@ MULTIPLIER_TURN = 0.28
 MULTIPLIER_CONSTANT = 5
 STRAFING = False
 
-def distance(x1, y1, x2 ,y2):
+def getDistance(x1, y1, x2 ,y2):
         dis = math.sqrt((x1-x2)  ** 2 + (y1-y2) ** 2)
         return dis
 
@@ -69,14 +69,20 @@ class Agent():
 
 
         #If clear has not be initialized we query the api
-        if clear is None:   
-            x_close, y_close = self.me.findCoordinates(0, PERCEPTORS_DISTANCE)
-            clear = self.api.moveTest(self.me.id, x_close, y_close)
+        if clear is None:
+            if(self.me.distanceToPos(x ,y) < PERCEPTORS_DISTANCE):
+                clear = self.api.moveTest(self.me.id, x, y)
+            else:
+                x_close, y_close = self.me.findCoordinates(0, PERCEPTORS_DISTANCE)
+                print("Coordinates to check: ", x_close, y_close)
+                clear = self.api.moveTest(self.me.id, x_close, y_close)
             self.goToCleared = clear
             self.freshness = INITIAL_FRESHNESS
         #If it's not fresh or if it's false we query again
         elif self.freshness <= 0 or clear == False:
-            clear = self.api.moveTest(self.me.id, x, y)
+            x_close, y_close = self.me.findCoordinates(0, PERCEPTORS_DISTANCE)
+            print("Coordinates to check: ", x_close, y_close)
+            clear = self.api.moveTest(self.me.id, x_close, y_close)
             print("Clear: " + str(clear))
             self.goToCleared = clear
             self.freshness = INITIAL_FRESHNESS

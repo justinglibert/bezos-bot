@@ -55,6 +55,7 @@ def queryPlayers(world, agent):
 
 def init():
     me = api.getPlayerInfo()
+    print(me)
     players = api.getPlayers()
     objects = api.getObjects(DISTANCE)
     world = World(me, objects, players)
@@ -71,22 +72,20 @@ def findIdOfMostUsefulPolicies(world, policies, api):
 
 def main():
     #First init
+    print(stylize("BEZOS BOT", colored.fg("green")))
     world, agent = init()
     queryObjectsTimer = RepeatedTimer(QUERY_OBJECT_FREQUENCY, queryObjects, world)
     queryPlayersTimer = RepeatedTimer(QUERY_PLAYER_FREQUENCY, queryPlayers, world, agent)
-    reached = False
     while True:
-        print(stylize("BEZOS BOT", colored.fg("green")))
+        
         agent.print()
         best_pol = findIdOfMostUsefulPolicies(world, Policies, api)
+        print(stylize("Policy: " + best_pol.getName(), colored.fg("green")))
         best_pol.execute(world, agent)
         #clearscreen()
         #world.printObjects()
         time.sleep( 1 / 2)
-        world.printPlayers()
-        if agent.me.health <= 0:
-            agent.api.sendAction("shoot")
-            world, agent = init()
+        #world.printPlayers()
 
         
 
