@@ -4,7 +4,7 @@ MOVE_FRAME = 50
 INITIAL_FRESHNESS = 5
 PERCEPTORS = 12
 ANGLE_STEP = 15
-PERCEPTORS_DISTANCE = 300
+PERCEPTORS_DISTANCE = 500
 MULTIPLIER_TURN = 0.28
 MULTIPLIER_CONSTANT = 5
 STRAFING = False
@@ -22,7 +22,8 @@ class Agent():
     def updateMe(self, me):
         self.me = me
     
-
+    def setFreshness(self, freshness):
+        self.freshness = freshness
 
     def findOffset(self):
         #Negative offset = to the left, positive = to the right
@@ -86,6 +87,7 @@ class Agent():
 
 
         #If clear has not be initialized we query the api
+        print("Freshness: " + str(self.freshness))
         if clear is None:
             if(self.me.distanceToPos(x ,y) < PERCEPTORS_DISTANCE):
                 clear = self.api.moveTest(self.me.id, x, y)
@@ -96,10 +98,15 @@ class Agent():
             self.goToCleared = clear
             self.freshness = INITIAL_FRESHNESS
         #If it's not fresh or if it's false we query again
+       
         elif self.freshness <= 0 or clear == False:
-            x_close, y_close = self.me.findCoordinates(0, PERCEPTORS_DISTANCE)
-            print("Coordinates to check: ", x_close, y_close)
-            clear = self.api.moveTest(self.me.id, x_close, y_close)
+            print("RECHECKING THE CLARITY")
+            if(self.me.distanceToPos(x ,y) < PERCEPTORS_DISTANCE):
+                clear = self.api.moveTest(self.me.id, x, y)
+            else:
+                x_close, y_close = self.me.findCoordinates(0, PERCEPTORS_DISTANCE)
+                print("Coordinates to check: ", x_close, y_close)
+                clear = self.api.moveTest(self.me.id, x_close, y_close)
             print("Clear: " + str(clear))
             self.goToCleared = clear
             self.freshness = INITIAL_FRESHNESS

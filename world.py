@@ -66,7 +66,7 @@ class World():
 
 
     def rankPlayersByDistance(self):
-        players = list({x for x in self.players if x.me == False})
+        players = list({x for x in self.players if x.me == False and x.health > 0})
         me = self.getMe()   
         players = sorted(players, key= lambda p: getDistance(p.x, p.y, me.x, me.y))
         return players
