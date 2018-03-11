@@ -70,12 +70,14 @@ class Agent():
 
         #If clear has not be initialized we query the api
         if clear is None:   
-            clear = self.api.moveTest(self.me.id, x, y)
+            x_close, y_close = self.me.findCoordinates(0, PERCEPTORS_DISTANCE)
+            clear = self.api.moveTest(self.me.id, x_close, y_close)
             self.goToCleared = clear
             self.freshness = INITIAL_FRESHNESS
         #If it's not fresh or if it's false we query again
         elif self.freshness <= 0 or clear == False:
             clear = self.api.moveTest(self.me.id, x, y)
+            print("Clear: " + str(clear))
             self.goToCleared = clear
             self.freshness = INITIAL_FRESHNESS
         #Otherwise  we decrease the freshness

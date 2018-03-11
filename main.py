@@ -11,7 +11,8 @@ import time
 import os
 import math
 from timer import RepeatedTimer
-API_ENDPOINT = "http://192.168.43.222:6001/api"
+import sys
+API_ENDPOINT = 'http://' + sys.argv[1] + '/api'
 #API_ENDPOINT = "http://localhost:6001/api"
 
 api = Api(API_ENDPOINT)
