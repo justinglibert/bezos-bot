@@ -6,12 +6,13 @@ from player import Player
 from world import World
 from policy import Policy
 from agent import Agent
+from policies import Policies
 import time
 import os
 import math
 from timer import RepeatedTimer
-#API_ENDPOINT = "http://192.168.43.222:6001/api"
-API_ENDPOINT = "http://localhost:6001/api"
+API_ENDPOINT = "http://192.168.43.222:6001/api"
+#API_ENDPOINT = "http://localhost:6001/api"
 
 api = Api(API_ENDPOINT)
 #Hyperparameters
@@ -23,42 +24,6 @@ def getDistance(x1, y1, x2 ,y2):
         dis = math.sqrt((x1-x2)  ** 2 + (y1-y2) ** 2)
         return dis
 
-
-
-
-
-polShotGun = Policy(lambda world: 100 *int(world.getMe().weapons['Shotgun'] == False), lambda world, agent: agent.goTo(520, -495, False))
-
-
-
-def polChainsawExecute(world, agent):
-    closestChainsaw = world.findClosestObjectByType('Chainsaw')
-    agent.goTo(closestChainsaw.x, closestChainsaw.y)
-
-polChainsaw= Policy(lambda world: 200 *int(world.getMe().weapons['Chainsaw'] == False), polChainsawExecute)
-
-
-polNothing = Policy(lambda world: 1, lambda world, agent: print("Nothing to do"))
-
-
-
-def polShootPlayerUtility(world):
-    closePlayers = world.rankPlayersByDistance()
-    closest = closePlayers[0]
-    me = world.getMe()
-    return (getDistance(closest.x, closest.y, me.x, me.y) < 10000) * 10**5
-
-def polShootPlayerExecute(world, agent):
-    closePlayers = world.rankPlayersByDistance()
-    closest = closePlayers[0]
-    agent.goTo(closest.x, closest.y)
-    agent.api.sendAction("shoot")
-    
-
-polShootPlayer = Policy(polShootPlayerUtility, polShootPlayerExecute)
-
-
-policies = [polShotGun, polNothing, polChainsaw, polShootPlayer]
 
 def clearscreen(numlines=100):
   """Clear the console.
@@ -112,7 +77,7 @@ def main():
     while True:
         print(stylize("BEZOS BOT", colored.fg("green")))
         agent.print()
-        best_pol = findIdOfMostUsefulPolicies(world, policies, api)
+        best_pol = findIdOfMostUsefulPolicies(world, Policies, api)
         best_pol.execute(world, agent)
         #clearscreen()
         #world.printObjects()

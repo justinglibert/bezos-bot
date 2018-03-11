@@ -24,6 +24,9 @@ class World():
                 self.objects.add(DoomObject(o))
 
 
+    def resetMe(self, me):
+        self.playerId = me['id']
+    
     def update(self, objects, players):
         self.updateObjects(objects)
         self.updatePlayers(players)
