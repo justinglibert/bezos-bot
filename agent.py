@@ -55,7 +55,24 @@ class Agent():
         return 0
 
 
+    def face(self, x, y):
+        computedAngle = self.me.angleToPos(x, y)
 
+        print("ComputedAngle: " + str(computedAngle)) 
+        if abs(computedAngle) < 5:
+            return True
+        else:
+            turn_type = None
+            if computedAngle > 180:
+                computedAngle = computedAngle - 360
+            if computedAngle < -180:
+                computedAngle = 360 + computedAngle
+            if computedAngle > 0:
+                turn_type = "turn-left"
+            else:
+                turn_type = "turn-right"
+            self.api.sendAction(turn_type, abs(computedAngle) * MULTIPLIER_TURN + MULTIPLIER_CONSTANT)
+            return False
     def goTo(self, x, y, noSlowDown = False):
 
         clear = self.goToCleared
@@ -137,7 +154,7 @@ class Agent():
                 else:
                     turn_type = "turn-right"
                 self.api.sendAction(turn_type, abs(computedAngle) * MULTIPLIER_TURN + MULTIPLIER_CONSTANT)
-                self.api.sendAction("forward", speed)
+                self.api.sendAction("forward", speed + 40)
             return False
     
     def print(self):

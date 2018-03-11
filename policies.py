@@ -45,9 +45,9 @@ WEAPONS = {
 
 def rankWeaponsBasedOnAvailabityAndAmmo(me):
     weapons = [v for (k,v) in WEAPONS.items() if me.weapons[k] == True and me.ammo[v['ammo']] > 0 ]
-    print(weapons)
+    #print(weapons)
     weapons = sorted(weapons, key = lambda w: w['strength'], reverse=True)
-    print("My weapons: " + str(weapons))
+    #print("My weapons: " + str(weapons))
     return weapons
 
 
@@ -129,6 +129,8 @@ polChainsaw= Policy(polChainsawUtility, polChainsawExecute, "Grabing a Chainsaw"
 def polChooseWeaponUtility(world):
     me = world.getMe()
     weapons = rankWeaponsBasedOnAvailabityAndAmmo(me)
+    if len(weapons) <= 0:
+        return 1
     print("Current WeaponID: " + str(me.currentWeapon))
     print("Projected One: " + str(weapons[0]['id']))
     if weapons[0]['id']  != me.currentWeapon + 1:
@@ -149,6 +151,22 @@ def polChooseWeaponExecute(world, agent):
 
 polChooseWeapon = Policy(polChooseWeaponUtility, polChooseWeaponExecute, "Changing weapon")
 
+#Ammo
+def polShotgunShellsUtility(world):
+    if world.findClosestObjectByType('Shotgun shells') is not None and world.getMe().weapons['Shotgun'] == True and world.getMe().ammo['Shells'] <=0:
+        return 1000 *int(world.getMe().weapons['Chainsaw'] == False)
+    else:
+        return 0
+
+
+def polShotgunShellsExecute(world, agent):
+    closestShells = world.findClosestObjectByType('Shotgun shells')
+    agent.goTo(closestShells.x, closestShells.y)
+
+polShotgunShells= Policy(polShotgunShellsUtility, polShotgunShellsExecute, "Grabing a shells")
+
+
+#Shooting
 def polShootPlayerUtility(world):
     closePlayers = world.rankPlayersByDistance()
     closest = closePlayers[0]
@@ -160,14 +178,33 @@ def polShootPlayerExecute(world, agent):
     me = world.getMe()
     closest = closePlayers[0]
     distance = getDistance(closest.x, closest.y, me.x, me.y)
-    agent.goTo(closest.x, closest.y)
-    if distance < 1000 and agent.goToCleared:
+    if distance > 150:
+        agent.goTo(closest.x, closest.y)
+    else:
+        print("Too Close!!")
+        agent.face(closest.x, closest.y)
+    print(str(agent.goToCleared))
+    if (distance < 1000 and agent.goToCleared) or distance < 200:
         print("Angle of shooting: " + str(abs(agent.me.angleToPos(closest.x, closest.y))))
         if abs(agent.me.angleToPos(closest.x, closest.y)) < 30:
-            agent.api.sendAction("shoot")
+            if(agent.api.moveTest(agent.me.id, closest.x , closest.y)):
+                agent.api.sendAction("shoot")
     
-
 polShootPlayer = Policy(polShootPlayerUtility, polShootPlayerExecute, "Killing players")
 
+
+def polShootPlayerLowLifeUtility(world):
+    closePlayers = world.rankPlayersByDistance()
+    closest = closePlayers[0]
+    if closest.health < 40:
+        me = world.getMe()
+        return (getDistance(closest.x, closest.y, me.x, me.y) < 10000) * 2000
+    else:
+        return 1
+    
+polShootPlayerLowLife = Policy(polShootPlayerLowLifeUtility, polShootPlayerExecute, "Killing low life players")
+
+#Green armor 100%
+
 #polChooseWeapon
-Policies = [polNothing, polDead, polShotGun, polChainsaw, polBFG, polShootPlayer, polChooseWeapon]
+Policies = [polNothing, polDead, polShotGun, polChainsaw, polBFG, polShootPlayer, polShootPlayerLowLife, polChooseWeapon, polShotgunShells]

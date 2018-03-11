@@ -74,10 +74,11 @@ def main():
     #First init
     print(stylize("BEZOS BOT", colored.fg("green")))
     world, agent = init()
-    queryObjectsTimer = RepeatedTimer(QUERY_OBJECT_FREQUENCY, queryObjects, world)
-    queryPlayersTimer = RepeatedTimer(QUERY_PLAYER_FREQUENCY, queryPlayers, world, agent)
+    #queryObjectsTimer = RepeatedTimer(QUERY_OBJECT_FREQUENCY, queryObjects, world)
+    #queryPlayersTimer = RepeatedTimer(QUERY_PLAYER_FREQUENCY, queryPlayers, world, agent)
     while True:
-        
+        queryObjects(world)
+        queryPlayers(world, agent)
         agent.print()
         best_pol = findIdOfMostUsefulPolicies(world, Policies, api)
         print(stylize("Policy: " + best_pol.getName(), colored.fg("green")))
