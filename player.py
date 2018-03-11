@@ -98,4 +98,21 @@ class Player():
         topY = 2276
         bottomX = -4175
         bottomY = -3615
-        return (self.x >= bottomX and self.x <= topX and self.y >= bottomY and self.y <= topY)        
+        return (self.x >= bottomX and self.x <= topX and self.y >= bottomY and self.y <= topY)
+    def getDistanceFromLines(self, x1, y1):
+        if self.angle == 0:
+            return self.x - x1
+        elif self.angle == 180:
+            return x1 - self.x
+        a = math.tan((math.pi/180) * self.angle )
+        b = -1
+        c = y1 - a * x1
+        print("a: " + str(a))
+        if a == 0:
+            return None
+        else:
+            dist = a * self.x + b * self.y + c / math.sqrt(a*a + b*b)
+        if self.angle < 180:
+            return dist
+        else:
+            return -dist        

@@ -81,7 +81,7 @@ def main():
         queryPlayers(world, agent)
         agent.print()
         best_pol = findIdOfMostUsefulPolicies(world, Policies, api)
-        print(stylize("Policy: " + best_pol.getName(), colored.fg("green")))
+        print(stylize("Policy: " + best_pol.getName(), colored.fg("green") + " Force: " + str(best_pol.test(world, api))))
         best_pol.execute(world, agent)
         #clearscreen()
         #world.printObjects()
