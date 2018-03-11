@@ -61,3 +61,10 @@ class Player():
         y = self.y + distance * math.sin(alpha)
         
         return int(round(x)), int(round(y))
+
+    def isInRectangle(self):
+        topX = 1700
+        topY = 2276
+        bottomX = -4175
+        bottomY = -3615
+        return (self.x >= bottomX and self.x <= topX and self.y >= bottomY and self.y <= topY)        
