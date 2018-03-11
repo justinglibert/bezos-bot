@@ -175,6 +175,43 @@ class Agent():
     
     
     def goToBackward(self, x, y, x_facing, y_facing):
+        freshness = self.freshness
+        clear = self.goToCleared
+
+        if freshness <= 0 or clear == False:
+            print("RECHECKING THE CLARITY")
+            if(self.api.moveTest(self.me.id, x, y)):
+                clear = True
+            elif(self.me.distanceToPos(x ,y) < PERCEPTORS_DISTANCE):
+                clear = self.api.moveTest(self.me.id, x, y)
+            else:
+                x_close, y_close = self.me.findCoordinates(0, PERCEPTORS_DISTANCE)
+                print("Coordinates to check: ", x_close, y_close)
+                clear = self.api.moveTest(self.me.id, x_close, y_close)
+            print("Clear: " + str(clear))
+            self.goToCleared = clear
+            self.freshness = INITIAL_FRESHNESS
+        #Otherwise  we decrease the freshness
+        else:
+            self.freshness = self.freshness - 1
+            
+
+        speed = MOVE_FRAME
+        if not clear:
+            computedAngle = self.findOffset()
+            turn_type = None
+            if computedAngle > 180:
+                computedAngle = 360 - computedAngle
+            if computedAngle < -180:
+                computedAngle = 360 + computedAngle
+            if computedAngle > 0:
+                turn_type = "turn-left"
+            else:
+                turn_type = "turn-right"
+            self.api.sendAction(turn_type, abs(computedAngle) * MULTIPLIER_TURN + MULTIPLIER_CONSTANT)
+            self.api.sendAction("forward", speed + 40)
+
+
         computedAngle = self.me.angleToPos(x_facing, y_facing)
         distance = getDistance(self.me.x, self.me.y, x, y)
         print("ComputedAngle: " + str(computedAngle)) 
