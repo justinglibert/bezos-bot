@@ -1,5 +1,6 @@
 import requests
 import json
+from throttle import throttle
 class Api():
     def __init__(self, endpoint):
         self.endpoint = endpoint
@@ -21,8 +22,12 @@ class Api():
         return r.json()
     def sendAction(self, action_type, amount = 10):
         payload = {'type': action_type, 'amount': amount}
-        r = requests.post(self.endpoint + '/player/actions', data=json.dumps(payload))
-        return r.text
+        try:
+            r = requests.post(self.endpoint + '/player/actions', data=json.dumps(payload))
+            return r.text
+        except requests.exceptions.ChunkedEncodingError as e:  # This is the correct syntax
+            print(e)
+            return 0
     def turn(self, angle):
         payload = {'target_angle': angle}
         r = requests.post(self.endpoint + '/player/turn', data=json.dumps(payload))

@@ -11,12 +11,19 @@ class Player():
         self.x = json['position']['x']
         self.y = json['position']['y']
         self.z = json['position']['z']
+        self.currentWeapon = json['weapon']
         self.weapons = json['weapons']
+        self.ammo = json['ammo']
+        self.armor = json['armor']
         self.height = json['height']
         self.angle = json['angle']
         self.health = json['health']
 
         self.type = 'Player'
+
+
+    def setCurrentWeapon(self, id):
+        self.currentWeapon = id
         
     def print(self):
         #print(greenText("PlayerId: " + str(self.id)))
@@ -30,7 +37,7 @@ class Player():
         angle: {5}
         '''.format(self.x, self.y, self.z, self.height, self.health, self.angle))
     
-    def angleToPos(self, x, y):
+    def oldAngleToPos(self, x, y):
         dis = math.sqrt((x-self.x) ** 2 + (y-self.y) ** 2)
         x_off = x - self.x
         y_off = y - self.y
@@ -50,6 +57,30 @@ class Player():
             return round(-360 + t) % 360
         else:
             return round(t)
+    def angleToPos(self, x ,y):
+        dx = x - self.x
+        dy = y - self.y
+        dis = math.sqrt(dx*dx + dy*dy)
+        if (dis == 0):
+            return 0
+        # 180 < alpha < 0 -> angle between x=0 and position (x,y)
+        if (dy > 0):
+            alpha = math.acos(dx / dis) * 180 / math.pi
+        else:
+            alpha = - math.acos(dx / dis) * 180 / math.pi
+        print ("alpha: " + str(alpha))
+
+        angleToTurn = (alpha - self.angle) % 360
+        print("angleToTurn: " + str(angleToTurn))
+
+        if (angleToTurn > 180):
+            result =  angleToTurn - 360
+        elif (angleToTurn < -180):
+            result = 360 + angleToTurn
+        else:
+            result = angleToTurn
+
+        return result
     
     def distanceToPos(self, x ,y):
         dis = math.sqrt((x-self.x) ** 2 + (y-self.y) ** 2)
